@@ -6,12 +6,13 @@ const EMPTY_REG = { firstName: "", lastName: "", email: "", phone: "", password:
 
 export default function LoginPage({ onClose, onSuccess, defaultMode = "login" }) {
   const { login } = useAuth();
-  const [mode, setMode]       = useState(defaultMode);
-  const [email, setEmail]     = useState("");
+  const [mode, setMode]         = useState(defaultMode); // "login" | "register" | "check-email"
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
-  const [reg, setReg]         = useState(EMPTY_REG);
-  const [error, setError]     = useState("");
-  const [loading, setLoading] = useState(false);
+  const [reg, setReg]           = useState(EMPTY_REG);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
 
   function switchMode(m) { setMode(m); setError(""); }
 
@@ -22,7 +23,10 @@ export default function LoginPage({ onClose, onSuccess, defaultMode = "login" })
       await login(email, password);
       onSuccess?.();
     } catch (err) {
-      setError(err.message ?? "Erreur de connexion");
+      if (err.status === 403 || err.message === "EMAIL_NOT_VERIFIED")
+        setError("Veuillez confirmer votre email avant de vous connecter.");
+      else
+        setError(err.message ?? "Erreur de connexion");
     } finally { setLoading(false); }
   }
 
@@ -32,9 +36,8 @@ export default function LoginPage({ onClose, onSuccess, defaultMode = "login" })
     setError(""); setLoading(true);
     try {
       await dataApi.register({ firstName: reg.firstName, lastName: reg.lastName, email: reg.email, phone: reg.phone, password: reg.password });
-      // auto-login after register
-      await login(reg.email, reg.password);
-      onSuccess?.();
+      setRegisteredEmail(reg.email);
+      setMode("check-email");
     } catch (err) {
       setError(err.message ?? "Erreur lors de l'inscription");
     } finally { setLoading(false); }
@@ -45,65 +48,80 @@ export default function LoginPage({ onClose, onSuccess, defaultMode = "login" })
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✖</button>
 
-        {/* Tabs */}
-        <div className="auth-tabs">
-          <button className={mode === "login" ? "auth-tab active" : "auth-tab"} onClick={() => switchMode("login")}>
-            Connexion
-          </button>
-          <button className={mode === "register" ? "auth-tab active" : "auth-tab"} onClick={() => switchMode("register")}>
-            S'inscrire
-          </button>
-        </div>
-
-        {mode === "login" ? (
-          <>
-            <p className="modal-sub">Accédez à votre espace client</p>
-            <form onSubmit={handleLogin}>
-              <label>Email</label>
-              <input type="email" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
-              <label>Mot de passe</label>
-              <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              {error && <p className="form-error">{error}</p>}
-              <button type="submit" className="btn-submit" disabled={loading}>
-                {loading ? "Connexion…" : "Se connecter"}
-              </button>
-            </form>
-            <p className="auth-switch">
-              Pas encore de compte ?{" "}
-              <button className="auth-switch-btn" onClick={() => switchMode("register")}>S'inscrire</button>
+        {/* ── Check email screen ── */}
+        {mode === "check-email" ? (
+          <div style={{ textAlign: "center", padding: "12px 0" }}>
+            <div style={{ fontSize: 52, marginBottom: 16 }}>📧</div>
+            <h2 style={{ marginBottom: 8 }}>Vérifiez votre email</h2>
+            <p style={{ color: "#64748b", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
+              Un lien de confirmation a été envoyé à<br />
+              <strong>{registeredEmail}</strong><br />
+              Cliquez sur le lien pour activer votre compte.
             </p>
-          </>
+            <p style={{ color: "#94a3b8", fontSize: 12, marginBottom: 20 }}>Le lien expire dans 24 heures.</p>
+            <button className="auth-switch-btn" onClick={() => switchMode("login")}>
+              ← Retour à la connexion
+            </button>
+          </div>
         ) : (
           <>
-            <p className="modal-sub">Créez votre espace client gratuitement</p>
-            <form onSubmit={handleRegister}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                <div>
-                  <label>Prénom</label>
-                  <input value={reg.firstName} onChange={(e) => setReg({ ...reg, firstName: e.target.value })} required />
-                </div>
-                <div>
-                  <label>Nom</label>
-                  <input value={reg.lastName} onChange={(e) => setReg({ ...reg, lastName: e.target.value })} required />
-                </div>
-              </div>
-              <label>Email</label>
-              <input type="email" value={reg.email} onChange={(e) => setReg({ ...reg, email: e.target.value })} required />
-              <label>Téléphone</label>
-              <input value={reg.phone} onChange={(e) => setReg({ ...reg, phone: e.target.value })} placeholder="+213..." />
-              <label>Mot de passe</label>
-              <input type="password" value={reg.password} onChange={(e) => setReg({ ...reg, password: e.target.value })} required minLength={6} />
-              <label>Confirmer le mot de passe</label>
-              <input type="password" value={reg.confirm} onChange={(e) => setReg({ ...reg, confirm: e.target.value })} required minLength={6} />
-              {error && <p className="form-error">{error}</p>}
-              <button type="submit" className="btn-submit" disabled={loading}>
-                {loading ? "Inscription…" : "Créer mon compte"}
-              </button>
-            </form>
-            <p className="auth-switch">
-              Déjà un compte ?{" "}
-              <button className="auth-switch-btn" onClick={() => switchMode("login")}>Se connecter</button>
-            </p>
+            {/* Tabs */}
+            <div className="auth-tabs">
+              <button className={mode === "login" ? "auth-tab active" : "auth-tab"} onClick={() => switchMode("login")}>Connexion</button>
+              <button className={mode === "register" ? "auth-tab active" : "auth-tab"} onClick={() => switchMode("register")}>S'inscrire</button>
+            </div>
+
+            {mode === "login" ? (
+              <>
+                <p className="modal-sub">Accédez à votre espace client</p>
+                <form onSubmit={handleLogin}>
+                  <label>Email</label>
+                  <input type="email" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
+                  <label>Mot de passe</label>
+                  <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                  {error && <p className="form-error">{error}</p>}
+                  <button type="submit" className="btn-submit" disabled={loading}>
+                    {loading ? "Connexion…" : "Se connecter"}
+                  </button>
+                </form>
+                <p className="auth-switch">
+                  Pas encore de compte ?{" "}
+                  <button className="auth-switch-btn" onClick={() => switchMode("register")}>S'inscrire</button>
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="modal-sub">Créez votre espace client gratuitement</p>
+                <form onSubmit={handleRegister}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    <div>
+                      <label>Prénom</label>
+                      <input value={reg.firstName} onChange={(e) => setReg({ ...reg, firstName: e.target.value })} required />
+                    </div>
+                    <div>
+                      <label>Nom</label>
+                      <input value={reg.lastName} onChange={(e) => setReg({ ...reg, lastName: e.target.value })} required />
+                    </div>
+                  </div>
+                  <label>Email</label>
+                  <input type="email" value={reg.email} onChange={(e) => setReg({ ...reg, email: e.target.value })} required />
+                  <label>Téléphone</label>
+                  <input value={reg.phone} onChange={(e) => setReg({ ...reg, phone: e.target.value })} placeholder="+213..." />
+                  <label>Mot de passe</label>
+                  <input type="password" value={reg.password} onChange={(e) => setReg({ ...reg, password: e.target.value })} required minLength={6} />
+                  <label>Confirmer le mot de passe</label>
+                  <input type="password" value={reg.confirm} onChange={(e) => setReg({ ...reg, confirm: e.target.value })} required minLength={6} />
+                  {error && <p className="form-error">{error}</p>}
+                  <button type="submit" className="btn-submit" disabled={loading}>
+                    {loading ? "Inscription…" : "Créer mon compte"}
+                  </button>
+                </form>
+                <p className="auth-switch">
+                  Déjà un compte ?{" "}
+                  <button className="auth-switch-btn" onClick={() => switchMode("login")}>Se connecter</button>
+                </p>
+              </>
+            )}
           </>
         )}
       </div>

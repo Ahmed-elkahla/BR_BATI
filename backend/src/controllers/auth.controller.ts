@@ -37,6 +37,7 @@ export async function login(req: Request, res: Response) {
     return res.json({ user,accessToken });
   } catch (e: any) {
     if (e.message === "INVALID_CREDENTIALS") return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+    if (e.message === "EMAIL_NOT_VERIFIED")  return res.status(403).json({ message: "EMAIL_NOT_VERIFIED" });
     return res.status(500).json({ message: "Erreur serveur" });
   }
 }

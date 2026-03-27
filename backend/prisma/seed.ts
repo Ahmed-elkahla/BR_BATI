@@ -10,13 +10,13 @@ async function main() {
   await prisma.user.upsert({
     where: { email: "admin@ar-bati.com" },
     update: {},
-    create: { email: "admin@ar-bati.com", passwordHash: hash, firstName: "Admin", lastName: "BâtiPro", phone: "+213550000001", role: "ADMIN" },
+    create: { email: "admin@ar-bati.com", passwordHash: hash, firstName: "Admin", lastName: "BâtiPro", phone: "+213550000001", role: "ADMIN", emailVerified: true },
   });
 
   const client = await prisma.user.upsert({
     where: { email: "client@ar-bati.com" },
     update: {},
-    create: { email: "client@ar-bati.com", passwordHash: hash, firstName: "Karim", lastName: "Benali", phone: "+213550000002", role: "CLIENT" },
+    create: { email: "client@ar-bati.com", passwordHash: hash, firstName: "Karim", lastName: "Benali", phone: "+213550000002", role: "CLIENT", emailVerified: true },
   });
 
   // ── Public showcase projects ───────────────────────────────────────────────

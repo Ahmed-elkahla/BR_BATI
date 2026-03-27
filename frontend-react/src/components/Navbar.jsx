@@ -1,24 +1,31 @@
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar({ onLoginClick, onRegisterClick }) {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate("/");
+  }
 
   return (
     <header className="navbar">
-      <div className="logo">
+      <NavLink to="/" className="logo" style={{ textDecoration: "none" }}>
         <div className="icon">🏗️</div>
         <div>
           <h2>BâtiPro</h2>
           <span>Architecture & Construction</span>
         </div>
-      </div>
+      </NavLink>
 
       <nav>
-        <a className="active" href="#">Accueil</a>
-        <a href="#">Services</a>
-        <a href="#">Réalisations</a>
-        <a href="#">Demander un devis</a>
-        <a href="#">Contact</a>
+        <NavLink to="/"            end className={({ isActive }) => isActive ? "active" : ""}>Accueil</NavLink>
+        <NavLink to="/services"        className={({ isActive }) => isActive ? "active" : ""}>Services</NavLink>
+        <NavLink to="/realisations"    className={({ isActive }) => isActive ? "active" : ""}>Réalisations</NavLink>
+        <NavLink to="/devis"           className={({ isActive }) => isActive ? "active" : ""}>Demander un devis</NavLink>
+        <NavLink to="/contact"         className={({ isActive }) => isActive ? "active" : ""}>Contact</NavLink>
       </nav>
 
       {user ? (
@@ -26,7 +33,7 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
           <span className="user-badge">
             {user.role === "ADMIN" ? "👑" : "👤"} {user.firstName}
           </span>
-          <button className="btn-logout" onClick={logout}>Déconnexion</button>
+          <button className="btn-logout" onClick={handleLogout}>Déconnexion</button>
         </div>
       ) : (
         <div className="nav-auth-btns">

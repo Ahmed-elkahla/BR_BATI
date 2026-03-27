@@ -9,6 +9,7 @@ router.get ("/projects",             Data.getProjects);
 router.get ("/stats",                Data.getStats);
 router.get ("/services",             Data.getServices);
 router.post("/register",             Data.registerClient);
+router.get ("/verify-email",         Data.verifyEmail);
 
 // Admin
 router.get   ("/admin/kpis",         requireAuth, requireAdmin, Data.getAdminKpis);
