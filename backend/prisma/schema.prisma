@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?   @unique
+  role         String    @default("CLIENT")
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  projects     Project[]
+
+  @@index([role, isActive, createdAt])
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("Planification")
+  phase       String   @default("Études")
+  progress    Int      @default(0)
+  budget      Float    @default(0)
+  spent       Float    @default(0)
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  type        String?
+  year        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clientId    String?
+  client      User?    @relation(fields: [clientId], references: [id])
+
+  @@index([clientId, status])
+  @@map("projects")
+}
+
+model Service {
+  id    String @id @default(cuid())
+  icon  String
+  label String
+  desc  String
+  order Int    @default(0)
+
+  @@map("services")
+}
+
+model Stat {
+  id    String @id @default(cuid())
+  label String
+  value String
+  sub   String
+  order Int    @default(0)
+
+  @@map("stats")
+}
