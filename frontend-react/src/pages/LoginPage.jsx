@@ -6,11 +6,10 @@ const EMPTY_REG = { firstName: "", lastName: "", email: "", phone: "", password:
 
 export default function LoginPage({ onClose, onSuccess, defaultMode = "login" }) {
   const { login } = useAuth();
-  const [mode, setMode]         = useState(defaultMode); // "login" | "register" | "check-email"
+  const [mode, setMode]         = useState(defaultMode); // "login" | "register"
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [reg, setReg]           = useState(EMPTY_REG);
-  const [registeredEmail, setRegisteredEmail] = useState("");
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
@@ -23,10 +22,7 @@ export default function LoginPage({ onClose, onSuccess, defaultMode = "login" })
       await login(email, password);
       onSuccess?.();
     } catch (err) {
-      if (err.status === 403 || err.message === "EMAIL_NOT_VERIFIED")
-        setError("Veuillez confirmer votre email avant de vous connecter.");
-      else
-        setError(err.message ?? "Erreur de connexion");
+      setError(err.message ?? "Erreur de connexion");
     } finally { setLoading(false); }
   }
 
@@ -36,8 +32,7 @@ export default function LoginPage({ onClose, onSuccess, defaultMode = "login" })
     setError(""); setLoading(true);
     try {
       await dataApi.register({ firstName: reg.firstName, lastName: reg.lastName, email: reg.email, phone: reg.phone, password: reg.password });
-      setRegisteredEmail(reg.email);
-      setMode("check-email");
+      switchMode("login");
     } catch (err) {
       setError(err.message ?? "Erreur lors de l'inscription");
     } finally { setLoading(false); }
@@ -48,23 +43,7 @@ export default function LoginPage({ onClose, onSuccess, defaultMode = "login" })
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✖</button>
 
-        {/* ── Check email screen ── */}
-        {mode === "check-email" ? (
-          <div style={{ textAlign: "center", padding: "12px 0" }}>
-            <div style={{ fontSize: 52, marginBottom: 16 }}>📧</div>
-            <h2 style={{ marginBottom: 8 }}>Vérifiez votre email</h2>
-            <p style={{ color: "#64748b", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-              Un lien de confirmation a été envoyé à<br />
-              <strong>{registeredEmail}</strong><br />
-              Cliquez sur le lien pour activer votre compte.
-            </p>
-            <p style={{ color: "#94a3b8", fontSize: 12, marginBottom: 20 }}>Le lien expire dans 24 heures.</p>
-            <button className="auth-switch-btn" onClick={() => switchMode("login")}>
-              ← Retour à la connexion
-            </button>
-          </div>
-        ) : (
-          <>
+        <>
             {/* Tabs */}
             <div className="auth-tabs">
               <button className={mode === "login" ? "auth-tab active" : "auth-tab"} onClick={() => switchMode("login")}>Connexion</button>
@@ -123,7 +102,6 @@ export default function LoginPage({ onClose, onSuccess, defaultMode = "login" })
               </>
             )}
           </>
-        )}
       </div>
     </div>
   );

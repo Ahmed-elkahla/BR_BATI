@@ -1,8 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import db from "../db";
-import crypto from "crypto";
-import { sendVerificationEmail } from "../services/email.service";
+import bcrypt from "bcryptjs";
 
 // ── Public ────────────────────────────────────────────────────────────────────
 
@@ -65,50 +64,19 @@ export async function registerClient(req: AuthRequest, res: Response) {
   const { firstName, lastName, email, phone, password } = req.body;
   if (!firstName || !lastName || !email || !password)
     return res.status(400).json({ message: "Champs obligatoires manquants" });
+  if (password.length < 6)
+    return res.status(400).json({ message: "Le mot de passe doit contenir au moins 6 caractères" });
   try {
-    const bcrypt = await import("bcryptjs");
-    const passwordHash  = await bcrypt.hash(password, 10);
-    const verifyToken   = crypto.randomBytes(32).toString("hex");
-    const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
-
+    const passwordHash = await bcrypt.hash(password, 10);
     const user = await db.user.create({
-      data: {
-        firstName, lastName, email,
-        phone: phone || null,
-        passwordHash,
-        role: "CLIENT",
-        emailVerified: false,
-        verifyToken,
-        verifyTokenExpiry,
-      },
+      data: { firstName, lastName, email, phone: phone || null, passwordHash, role: "CLIENT", emailVerified: true },
       select: { id: true, firstName: true, lastName: true, email: true, role: true },
     });
-
-    await sendVerificationEmail(email, firstName, verifyToken);
-
-    return res.status(201).json({ message: "Compte créé. Vérifiez votre email pour activer votre compte.", user });
+    return res.status(201).json({ user });
   } catch (e: any) {
     if (e.code === "P2002") return res.status(409).json({ message: "Email ou téléphone déjà utilisé" });
     return res.status(500).json({ message: "Erreur serveur" });
   }
-}
-
-export async function verifyEmail(req: AuthRequest, res: Response) {
-  const { token } = req.query as { token: string };
-  if (!token) return res.status(400).json({ message: "Token manquant" });
-
-  const user = await db.user.findFirst({
-    where: { verifyToken: token, verifyTokenExpiry: { gt: new Date() } },
-  });
-
-  if (!user) return res.status(400).json({ message: "Lien invalide ou expiré" });
-
-  await db.user.update({
-    where: { id: user.id },
-    data: { emailVerified: true, verifyToken: null, verifyTokenExpiry: null },
-  });
-
-  return res.json({ message: "Email confirmé avec succès" });
 }
 
 export async function updateUser(req: AuthRequest, res: Response) {
@@ -229,6 +197,37 @@ export async function getClientProjects(req: AuthRequest, res: Response) {
 }
 
 export async function getClientDocuments(req: AuthRequest, res: Response) {
-  // Documents are not yet in the schema — return empty until model is added
   return res.json([]);
+}
+
+// ── Devis ─────────────────────────────────────────────────────────────────────
+
+export async function submitDevis(req: AuthRequest, res: Response) {
+  const { firstName, lastName, email, phone, projectType, budget, location, timeline, description } = req.body;
+  if (!firstName || !lastName || !email || !projectType || !description)
+    return res.status(400).json({ message: "Champs obligatoires manquants" });
+  try {
+    const devis = await db.devisRequest.create({
+      data: { firstName, lastName, email, phone: phone || null, projectType, budget, location, timeline, description },
+    });
+    return res.status(201).json({ devis });
+  } catch {
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+
+export async function getAdminDevis(_req: AuthRequest, res: Response) {
+  const list = await db.devisRequest.findMany({ orderBy: { createdAt: "desc" } });
+  return res.json(list);
+}
+
+export async function updateDevisStatus(req: AuthRequest, res: Response) {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    const devis = await db.devisRequest.update({ where: { id }, data: { status } });
+    return res.json({ devis });
+  } catch {
+    return res.status(404).json({ message: "Demande introuvable" });
+  }
 }

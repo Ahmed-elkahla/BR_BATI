@@ -44,4 +44,7 @@ export const dataApi = {
   deleteProject:   (id) => request(`/admin/projects/${id}`, { method: "DELETE" }),
   clientProjects:  () => request("/client/projects"),
   clientDocuments: () => request("/client/documents"),
+  submitDevis:     (body) => request("/devis", { method: "POST", body: JSON.stringify(body) }),
+  adminDevis:      () => request("/admin/devis"),
+  updateDevisStatus: (id, status) => request(`/admin/devis/${id}`, { method: "PUT", body: JSON.stringify({ status }) }),
 };

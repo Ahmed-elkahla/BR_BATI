@@ -16,9 +16,7 @@ model User {
   phone             String?   @unique
   role              String    @default("CLIENT")
   isActive          Boolean   @default(true)
-  emailVerified     Boolean   @default(false)
-  verifyToken       String?
-  verifyTokenExpiry DateTime?
+  emailVerified     Boolean   @default(true)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -60,6 +58,23 @@ model Service {
   order Int    @default(0)
 
   @@map("services")
+}
+
+model DevisRequest {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  projectType String
+  budget      String?
+  location    String?
+  timeline    String?
+  description String
+  status      String   @default("Nouveau")  // Nouveau | En cours | Traité | Refusé
+  createdAt   DateTime @default(now())
+
+  @@map("devis_requests")
 }
 
 model Stat {

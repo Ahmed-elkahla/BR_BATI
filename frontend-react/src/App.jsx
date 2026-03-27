@@ -9,8 +9,8 @@ import ServicesPage    from "./pages/ServicesPage";
 import RealisationsPage from "./pages/RealisationsPage";
 import DevisPage       from "./pages/DevisPage";
 import ContactPage     from "./pages/ContactPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ProtectedRoute  from "./components/ProtectedRoute";
+import DevisAdminPage    from "./dashboard/DevisAdminPage";
 import AdminDashboard  from "./dashboard/AdminDashboard";
 import UsersPage       from "./dashboard/UsersPage";
 import ProjectsPage    from "./dashboard/ProjectsPage";
@@ -42,15 +42,14 @@ export default function App() {
           <Route path="/realisations" element={<PublicLayout><RealisationsPage /></PublicLayout>} />
           <Route path="/devis"        element={<PublicLayout><DevisPage /></PublicLayout>} />
           <Route path="/contact"      element={<PublicLayout><ContactPage /></PublicLayout>} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
-
-          {/* Admin */}
+{/* Admin */}
           <Route path="/dashboard/admin/*" element={
             <ProtectedRoute role="ADMIN">
               <Routes>
                 <Route index          element={<AdminDashboard />} />
                 <Route path="users"    element={<UsersPage />} />
                 <Route path="projects" element={<ProjectsPage />} />
+                <Route path="devis"    element={<DevisAdminPage />} />
               </Routes>
             </ProtectedRoute>
           } />

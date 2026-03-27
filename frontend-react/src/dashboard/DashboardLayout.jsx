@@ -6,6 +6,7 @@ const adminLinks = [
   { to: "/dashboard/admin",          icon: "fa-gauge",        label: "Vue d'ensemble" },
   { to: "/dashboard/admin/users",    icon: "fa-users",        label: "Utilisateurs" },
   { to: "/dashboard/admin/projects", icon: "fa-diagram-project", label: "Projets" },
+  { to: "/dashboard/admin/devis",    icon: "fa-file-invoice",  label: "Devis" },
   { to: "/dashboard/admin/reports",  icon: "fa-chart-bar",    label: "Rapports" },
   { to: "/dashboard/admin/settings", icon: "fa-gear",         label: "Paramètres" },
 ];
@@ -13,9 +14,7 @@ const adminLinks = [
 const clientLinks = [
   { to: "/dashboard/client",             icon: "fa-gauge",        label: "Mon espace" },
   { to: "/dashboard/client/projects",    icon: "fa-hard-hat",     label: "Mes projets" },
-  { to: "/dashboard/client/documents",   icon: "fa-file-lines",   label: "Documents" },
-  { to: "/dashboard/client/messages",    icon: "fa-comments",     label: "Messages" },
-  { to: "/dashboard/client/settings",    icon: "fa-gear",         label: "Paramètres" },
+
 ];
 
 export default function DashboardLayout({ children }) {

@@ -38,8 +38,6 @@ export async function loginUser(email: string, password: string) {
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) throw new Error("INVALID_CREDENTIALS");
 
-  if (!user.emailVerified) throw new Error("EMAIL_NOT_VERIFIED");
-
   const payload: JwtPayload = { sub: user.id, role: user.role };
   return {
     accessToken: signAccessToken(payload),

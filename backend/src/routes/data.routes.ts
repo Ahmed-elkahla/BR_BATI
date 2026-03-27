@@ -9,7 +9,7 @@ router.get ("/projects",             Data.getProjects);
 router.get ("/stats",                Data.getStats);
 router.get ("/services",             Data.getServices);
 router.post("/register",             Data.registerClient);
-router.get ("/verify-email",         Data.verifyEmail);
+router.post("/devis",                Data.submitDevis);
 
 // Admin
 router.get   ("/admin/kpis",         requireAuth, requireAdmin, Data.getAdminKpis);
@@ -21,6 +21,8 @@ router.get   ("/admin/projects",     requireAuth, requireAdmin, Data.getAdminPro
 router.post  ("/admin/projects",     requireAuth, requireAdmin, Data.createProject);
 router.put   ("/admin/projects/:id", requireAuth, requireAdmin, Data.updateProject);
 router.delete("/admin/projects/:id", requireAuth, requireAdmin, Data.deleteProject);
+router.get   ("/admin/devis",        requireAuth, requireAdmin, Data.getAdminDevis);
+router.put   ("/admin/devis/:id",    requireAuth, requireAdmin, Data.updateDevisStatus);
 
 // Client
 router.get("/client/projects",       requireAuth, Data.getClientProjects);

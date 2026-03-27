@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { dataApi } from "../api/auth";
 
 const TYPES = ["Maison individuelle", "Immeuble résidentiel", "Bâtiment commercial", "Rénovation", "Extension", "Autre"];
 const BUDGETS = ["Moins de 50 000 €", "50 000 – 150 000 €", "150 000 – 500 000 €", "500 000 – 1 000 000 €", "Plus de 1 000 000 €"];
@@ -15,10 +16,14 @@ export default function DevisPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    // Simulate sending — replace with real API call when ready
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setSent(true);
+    try {
+      await dataApi.submitDevis(form);
+      setSent(true);
+    } catch (err) {
+      alert(err.message ?? "Erreur lors de l'envoi");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (sent) return (

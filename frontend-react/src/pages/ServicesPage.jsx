@@ -41,6 +41,79 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      {/* 3D COMPANY SHOWCASE */}
+      <section className="page-section">
+        <div className="page-container">
+          <div className="section-header">
+            <h2>Notre Société en 3D</h2>
+            <p>Découvrez BâtiPro sous un nouvel angle — architecture, innovation et excellence.</p>
+          </div>
+          <div className="company-3d-wrap">
+            <div className="company-3d-scene">
+              <div className="company-3d-card">
+                {/* FRONT */}
+                <div className="c3d-face c3d-front">
+                  <div className="c3d-logo">🏗️</div>
+                  <h2>BâtiPro</h2>
+                  <p>Architecture & Construction</p>
+                  <div className="c3d-divider" />
+                  <div className="c3d-stats">
+                    <div className="c3d-stat"><span>15+</span><small>Ans d'expérience</small></div>
+                    <div className="c3d-stat"><span>200+</span><small>Projets livrés</small></div>
+                    <div className="c3d-stat"><span>98%</span><small>Satisfaction client</small></div>
+                  </div>
+                </div>
+                {/* BACK */}
+                <div className="c3d-face c3d-back">
+                  <div className="c3d-logo">🏆</div>
+                  <h2>Notre Mission</h2>
+                  <p style={{ fontSize: 13, color: "#a0aec0", lineHeight: 1.7, margin: "12px 0" }}>
+                    Construire des espaces qui inspirent, durer dans le temps et respecter l'environnement. Chaque projet est une œuvre d'art fonctionnelle.
+                  </p>
+                  <div className="c3d-tags">
+                    <span>Innovation</span>
+                    <span>Durabilité</span>
+                    <span>Excellence</span>
+                    <span>Précision</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* SIDE INFO */}
+            <div className="company-3d-info">
+              <div className="c3d-info-item">
+                <div className="c3d-info-icon"><i className="fa-solid fa-building"></i></div>
+                <div>
+                  <h4>Fondée en 2009</h4>
+                  <p>Plus de 15 ans au service de vos projets de construction et d'architecture.</p>
+                </div>
+              </div>
+              <div className="c3d-info-item">
+                <div className="c3d-info-icon"><i className="fa-solid fa-users"></i></div>
+                <div>
+                  <h4>Équipe d'experts</h4>
+                  <p>50+ professionnels qualifiés : architectes, ingénieurs, chefs de chantier.</p>
+                </div>
+              </div>
+              <div className="c3d-info-item">
+                <div className="c3d-info-icon"><i className="fa-solid fa-globe"></i></div>
+                <div>
+                  <h4>Présence nationale</h4>
+                  <p>Interventions dans toutes les wilayas avec des équipes locales dédiées.</p>
+                </div>
+              </div>
+              <div className="c3d-info-item">
+                <div className="c3d-info-icon"><i className="fa-solid fa-leaf"></i></div>
+                <div>
+                  <h4>Éco-responsable</h4>
+                  <p>Matériaux certifiés et techniques de construction respectueuses de l'environnement.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* WHY US */}
       <section className="page-section alt">
         <div className="page-container">
